@@ -1,0 +1,68 @@
+name: Build Wine-tkg for ARM64
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    container:
+      image: arm64v8/ubuntu:22.04
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            build-essential \
+            git \
+            wget \
+            python3 \
+            python3-pip \
+            meson \
+            ninja-build \
+            pkg-config \
+            libfreetype6-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libxi-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libasound2-dev \
+            libpulse-dev \
+            libx11-dev \
+            libxext-dev \
+            libxrender-dev \
+            libxdmcp-dev \
+            libxau-dev \
+            libxcb1-dev \
+            libxcb-glx0-dev \
+            libxcomposite-dev \
+            libxdamage-dev \
+            libxfixes-dev \
+            libxi-dev
+
+      - name: Clone Wine-tkg
+        run: |
+          git clone https://github.com/Frogging-Family/wine-tkg.git
+          cd wine-tkg
+          git checkout master # 更改为你想要构建的分支
+
+      - name: Build Wine-tkg
+        run: |
+          cd wine-tkg
+          ./build.sh # 根据项目的构建指令执行
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: wine-tkg-arm64
+          path: / # 更改为构建输出的路径
